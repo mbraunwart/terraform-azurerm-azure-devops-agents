@@ -6,6 +6,8 @@
 
 This Terraform module provides a framework for deploying self-hosted Azure DevOps agents using Azure Container Instances. It simplifies the deployment of containerized build agents, ensuring they are secure, scalable, and integrated with Azure Container Registry.
 
+:NOTE: This module requires azure cli to be installed and logged in to the azure account.
+
 ## Purpose
 
 The module's main objective is to streamline the provisioning of containerized Azure DevOps agents, making it easy to deploy and manage custom build agents that run in Azure Container Instances. This enables teams to run their CI/CD pipelines in a controlled, isolated environment with specific tooling requirements.
