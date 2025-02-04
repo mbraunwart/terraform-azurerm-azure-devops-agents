@@ -57,6 +57,7 @@ Container insights are routed to Log Analytics, providing visibility into:
 - Azure Container Registry Basic SKU is used by default
 - Windows containers require specific subnet configurations
 - Container groups are limited to the resources specified during creation
+- Azure CLI must be installed and logged in to the Azure account
 
 ## Usage Example
 
