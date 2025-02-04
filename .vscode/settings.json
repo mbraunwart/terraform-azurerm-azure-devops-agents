@@ -1,0 +1,18 @@
+{
+    "[terraform]": {
+        "github.copilot.chat.codeGeneration.instructions": [
+            {
+                "file": ".github/terraform-instructions.md",
+                "language": "terraform"
+            },
+        ]
+    },
+    "[markdown]": {
+        "github.copilot.chat.codeGeneration.instructions": [
+            {
+                "file": ".github/markdown-instructions.md",
+                "language": "markdown"
+            }
+        ]
+    }
+}

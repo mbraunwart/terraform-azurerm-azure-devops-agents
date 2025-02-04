@@ -1,0 +1,41 @@
+formatter: md doc
+
+sections:
+  show:
+    - header
+    - requirements
+    - providers
+    - resources
+    - inputs
+    - outputs
+
+content: |-
+  {{ .Header }}
+
+  {{ .Requirements }}
+
+  {{ .Providers }}
+  
+  {{ .Resources }}
+  
+  {{ .Inputs }}
+  
+  {{ .Outputs }}
+
+header-from: .terraform-docs-header.md
+
+settings:
+  anchor: true
+  escape: false
+  indent: 2
+  required: true
+  sensitive: true
+  type: true
+
+sort:
+  enabled: true
+  by: required
+
+output:
+  file: README.md
+  mode: inject

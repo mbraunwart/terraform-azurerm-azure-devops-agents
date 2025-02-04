@@ -1,0 +1,30 @@
+FROM ubuntu:22.04
+
+ARG AGENT_VERSION
+ENV AGENT_VERSION=${AGENT_VERSION}
+ARG TARGETARCH
+ENV TARGETARCH=${TARGETARCH}
+
+RUN apt update
+RUN apt install -y curl git jq libicu70 apt-transport-https ca-certificates software-properties-common wget apt-utils
+RUN apt upgrade -y
+
+RUN wget https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb \
+ && dpkg -i packages-microsoft-prod.deb \
+ && apt-get update \
+ && apt-get install -y dotnet-sdk-8.0
+
+RUN apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /azp/
+
+COPY ./start.sh ./
+RUN chmod +x ./start.sh
+
+RUN useradd -m -d /home/agent agent
+RUN chown -R agent:agent /azp /home/agent
+
+USER agent
+
+ENTRYPOINT [ "./start.sh" ]
