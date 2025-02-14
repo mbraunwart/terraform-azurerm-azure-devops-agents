@@ -1,5 +1,6 @@
 FROM ubuntu:22.04
 
+ENV DEBIAN_FRONTEND=noninteractive
 ARG AGENT_VERSION
 ENV AGENT_VERSION=${AGENT_VERSION}
 ARG TARGETARCH
@@ -8,6 +9,8 @@ ENV TARGETARCH=${TARGETARCH}
 RUN apt update
 RUN apt install -y curl git jq libicu70 apt-transport-https ca-certificates software-properties-common wget apt-utils
 RUN apt upgrade -y
+
+RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash
 
 RUN wget https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb \
  && dpkg -i packages-microsoft-prod.deb \

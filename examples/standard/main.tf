@@ -21,7 +21,7 @@ resource "azurerm_resource_group" "rg" {
 }
 
 module "vnet" {
-  source = "github.com/mbraunwart/terraform-azurerm-networking.git?ref=nsg_updates"
+  source = "github.com/mbraunwart/terraform-azurerm-networking.git"
 
   providers = {
     azurerm        = azurerm
@@ -73,19 +73,18 @@ locals {
       ]
       containers = [
         {
-          name            = "dotnet-ado-agent"
-          image           = "dotnet-ado-agent"
-          tag             = "1.0"
-          cpu             = 2.0
-          memory          = 4
-          dockerfile_path = "../../Dockerfile.linux_dotnet"
+          name           = "dotnet-ado-agent"
+          image          = "dotnet-ado-agent"
+          tag            = "1.0"
+          dockerfile_type = "dotnet"
+          cpu            = 2.0
+          memory         = 4
           ports = [
             {
               port     = 443
               protocol = "TCP"
             }
           ]
-          environment_variables = {}
           secure_environment_variables = {
             AZP_TOKEN      = var.ado_pat
             AZP_URL        = "https://dev.azure.com/mrb-insight"
@@ -106,24 +105,56 @@ locals {
       ]
       containers = [
         {
-          name            = "java-ado-agent"
-          image           = "java-ado-agent"
-          tag             = "1.0"
-          cpu             = 2.0
-          memory          = 4
-          dockerfile_path = "../../Dockerfile.linux_java"
+          name           = "java-ado-agent"
+          image          = "java-ado-agent"
+          tag            = "1.0"
+          dockerfile_type = "java"
+          cpu            = 2.0
+          memory         = 4
           ports = [
             {
               port     = 443
               protocol = "TCP"
             }
           ]
-          environment_variables = {}
           secure_environment_variables = {
             AZP_TOKEN      = var.ado_pat
             AZP_URL        = "https://dev.azure.com/mrb-insight"
             AZP_POOL       = "container_pool"
             AZP_AGENT_NAME = "java-ado-agent"
+          }
+        }
+      ]
+    },
+    # Example with custom Dockerfile
+    custom = {
+      name      = "custom-ado-agent",
+      subnet_id = module.vnet.subnets["subnet-ado-agent"].id
+      exposed_ports = [
+        {
+          port     = 443
+          protocol = "TCP"
+        }
+      ]
+      containers = [
+        {
+          name                   = "custom-ado-agent"
+          image                  = "custom-ado-agent"
+          tag                    = "1.0"
+          custom_dockerfile_path = "./Dockerfile.custom_java"
+          cpu                   = 2.0
+          memory                = 4
+          ports = [
+            {
+              port     = 443
+              protocol = "TCP"
+            }
+          ]
+          secure_environment_variables = {
+            AZP_TOKEN      = var.ado_pat
+            AZP_URL        = "https://dev.azure.com/mrb-insight"
+            AZP_POOL       = "container_pool"
+            AZP_AGENT_NAME = "custom-ado-agent"
           }
         }
       ]
@@ -139,19 +170,18 @@ locals {
       ]
       containers = [
         {
-          name            = "terraform-ado-agent"
-          image           = "terraform-ado-agent"
-          tag             = "1.0"
-          cpu             = 2.0
-          memory          = 4
-          dockerfile_path = "../../Dockerfile.linux_terraform"
+          name           = "terraform-ado-agent"
+          image          = "terraform-ado-agent"
+          tag            = "1.0"
+          dockerfile_type = "terraform"
+          cpu            = 2.0
+          memory         = 4
           ports = [
             {
               port     = 443
               protocol = "TCP"
             }
           ]
-          environment_variables = {}
           secure_environment_variables = {
             AZP_TOKEN      = var.ado_pat
             AZP_URL        = "https://dev.azure.com/mrb-insight"
@@ -172,19 +202,18 @@ locals {
       ]
       containers = [
         {
-          name            = "python-ado-agent"
-          image           = "python-ado-agent"
-          tag             = "1.0"
-          cpu             = 2.0
-          memory          = 4
-          dockerfile_path = "../../Dockerfile.linux_python"
+          name           = "python-ado-agent"
+          image          = "python-ado-agent"
+          tag            = "1.0"
+          dockerfile_type = "python"
+          cpu            = 2.0
+          memory         = 4
           ports = [
             {
               port     = 443
               protocol = "TCP"
             }
           ]
-          environment_variables = {}
           secure_environment_variables = {
             AZP_TOKEN      = var.ado_pat
             AZP_URL        = "https://dev.azure.com/mrb-insight"

@@ -6,18 +6,34 @@ data "azurerm_container_registry" "acr" {
 }
 
 locals {
-  containers = distinct([
+  available_dockerfiles = {
+    terraform = "${path.module}/Dockerfile.linux_terraform"
+    python    = "${path.module}/Dockerfile.linux_python"
+    java      = "${path.module}/Dockerfile.linux_java"
+    dotnet    = "${path.module}/Dockerfile.linux_dotnet"
+  }
+
+  containers = [
     for container in var.containers : {
-      dockerfile_path = container.dockerfile_path
-      image          = container.image
-      tag            = container.tag
+      dockerfile_path = container.custom_dockerfile_path != null ? container.custom_dockerfile_path : (
+        container.dockerfile_type != null ? (
+          contains(keys(local.available_dockerfiles), container.dockerfile_type)
+          ? lookup(local.available_dockerfiles, container.dockerfile_type)
+          : fail("Invalid dockerfile_type for container ${container.name}. Valid options are: ${join(", ", keys(local.available_dockerfiles))}")
+        ) : fail("Either a custom_dockerfile_path or a valid dockerfile_type must be provided for container ${container.name}")
+      )
+      image = container.image
+      tag   = container.tag
       content_hash = sha256(join("", [
-        file(container.dockerfile_path),
+        file(
+          container.custom_dockerfile_path != null ? container.custom_dockerfile_path :
+          lookup(local.available_dockerfiles, container.dockerfile_type, "")
+        ),
         var.agent_version,
         var.target_arch
       ]))
     }
-  ])
+  ]
 }
 
 resource "azurerm_role_assignment" "acr_pull" {
@@ -61,6 +77,7 @@ resource "null_resource" "build_and_push_image" {
         --file '${each.value.dockerfile_path}' \
         --build-arg AGENT_VERSION=${var.agent_version} \
         --build-arg TARGETARCH=${var.target_arch} \
+        
         --no-format \
         "$path"
       EOT
@@ -74,9 +91,9 @@ resource "azurerm_container_group" "cg" {
   name                = var.container_group_name
   resource_group_name = var.resource_group_name
   location            = var.location
-  os_type            = var.os_type
-  ip_address_type    = "Private"
-  subnet_ids         = [var.subnet_id]
+  os_type             = var.os_type
+  ip_address_type     = "Private"
+  subnet_ids          = [var.subnet_id]
 
   dynamic "exposed_port" {
     for_each = var.exposed_ports
@@ -95,9 +112,9 @@ resource "azurerm_container_group" "cg" {
   dynamic "container" {
     for_each = var.containers
     content {
-      name   = container.value.name
-      image  = format("%s/%s:%s", data.azurerm_container_registry.acr.login_server, container.value.image,
-        [for c in local.containers : c.content_hash if c.image == container.value.image][0])
+      name = container.value.name
+      image = format("%s/%s:%s", data.azurerm_container_registry.acr.login_server, container.value.image,
+      [for c in local.containers : c.content_hash if c.image == container.value.image][0])
       cpu    = container.value.cpu
       memory = container.value.memory
 
@@ -109,13 +126,7 @@ resource "azurerm_container_group" "cg" {
         }
       }
 
-      environment_variables = merge(
-        container.value.environment_variables,
-        {
-          AGENT_VERSION = var.agent_version
-          TARGETARCH   = var.target_arch
-        }
-      )
+      environment_variables = container.value.environment_variables
       secure_environment_variables = container.value.secure_environment_variables
     }
   }

@@ -46,7 +46,11 @@ variable "exposed_ports" {
     port     = number
     protocol = string
   }))
-  description = "List of ports to expose on the container group"
+  description = <<EOF
+List of ports configuration including:
+  `port`     - The port number to expose
+  `protocol` - The protocol for the port (TCP or UDP)
+EOF
   default     = []
 }
 
@@ -58,12 +62,13 @@ variable "os_type" {
 
 variable "containers" {
   type = list(object({
-    name            = string
-    image           = string
-    tag             = string
-    dockerfile_path = string
-    cpu             = number
-    memory          = number
+    name                   = string
+    image                  = string
+    tag                    = string
+    dockerfile_type        = optional(string, null)
+    custom_dockerfile_path = optional(string)
+    cpu                    = number
+    memory                 = number
     ports = optional(list(object({
       port     = number
       protocol = string
@@ -71,7 +76,21 @@ variable "containers" {
     environment_variables        = optional(map(string), {})
     secure_environment_variables = optional(map(string), {})
   }))
-  description = "List of containers to deploy in the container group"
+  description = <<EOF
+List of container configurations including:
+  `name`                   - Name of the container instance
+  `image`                  - Container image to use
+  `tag`                    - Image tag
+  `dockerfile_type`        - (Optional) Type of dockerfile to use
+  `custom_dockerfile_path` - (Optional) Path to custom dockerfile
+  `cpu`                    - Number of CPU cores
+  `memory`                 - Memory in GB
+  `ports`                  - (Optional) List of ports configuration containing:
+    `port`                 - The port number to expose
+    `protocol`            - The protocol for the port (TCP or UDP)
+  `environment_variables`  - (Optional) Map of non-sensitive environment variables
+  `secure_environment_variables` - (Optional) Map of sensitive environment variables
+EOF
 }
 
 variable "log_analytics_workspace_id" {
