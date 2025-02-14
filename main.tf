@@ -58,7 +58,7 @@ resource "null_resource" "build_and_push_image" {
     interpreter = var.powershell ? ["PowerShell", "-Command"] : ["/bin/bash", "-c"]
     command = var.powershell ? (
       <<-EOT
-      $path="$(dirname '${each.value.dockerfile_path}')"
+      $path = Split-Path -Parent '${each.value.dockerfile_path}'
       az acr build `
         --registry ${data.azurerm_container_registry.acr.name} `
         --image ${format("%s:%s", each.value.image, each.value.content_hash)} `
