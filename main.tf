@@ -57,6 +57,7 @@ resource "null_resource" "build_and_push_image" {
   provisioner "local-exec" {
     interpreter = [ "/bin/bash", "-c" ]
     command = <<EOT
+      export AZURE_CORE_OUTPUT="none"
       export LANG=en_US.UTF-8
       export LC_ALL=en_US.UTF-8
       export PYTHONIOENCODING=UTF-8
