@@ -55,33 +55,17 @@ resource "null_resource" "build_and_push_image" {
     content_hash = each.value.content_hash
   }
   provisioner "local-exec" {
-    interpreter = var.powershell ? ["PowerShell", "-Command"] : ["/bin/bash", "-c"]
-    command = var.powershell ? (
-      <<-EOT
-      $path = Split-Path -Parent '${each.value.dockerfile_path}'
-      az acr build `
-        --registry ${data.azurerm_container_registry.acr.name} `
-        --image ${format("%s:%s", each.value.image, each.value.content_hash)} `
-        --file '${each.value.dockerfile_path}' `
-        --build-arg AGENT_VERSION=${var.agent_version} `
-        --build-arg TARGETARCH=${var.target_arch} `
-        --no-format `
-        $path
-      EOT
-      ) : (
-      <<-EOT
+    command = <<-EOT
       path="$(dirname '${each.value.dockerfile_path}')"
       az acr build \
         --registry ${data.azurerm_container_registry.acr.name} \
         --image ${format("%s:%s", each.value.image, each.value.content_hash)} \
         --file '${each.value.dockerfile_path}' \
         --build-arg AGENT_VERSION=${var.agent_version} \
-        --build-arg TARGETARCH=${var.target_arch} \
-        
+        --build-arg TARGETARCH=${var.target_arch} \        
         --no-format \
         "$path"
       EOT
-    )
   }
 
   depends_on = [time_sleep.timer]

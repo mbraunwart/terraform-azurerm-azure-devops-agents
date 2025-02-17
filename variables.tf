@@ -103,9 +103,3 @@ variable "log_analytics_workspace_key" {
   description = "The shared key of the Log Analytics workspace"
   sensitive   = true
 }
-
-variable "powershell" {
-  description = "Boolean flag to use PowerShell for commands, defaults to Bash"
-  type        = bool
-  default     = false
-}
