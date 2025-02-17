@@ -64,7 +64,7 @@ resource "null_resource" "build_and_push_image" {
         --build-arg AGENT_VERSION=${var.agent_version} \
         --build-arg TARGETARCH=${var.target_arch} \        
         --no-format \
-        "$path"
+        $path
       EOT
   }
 
