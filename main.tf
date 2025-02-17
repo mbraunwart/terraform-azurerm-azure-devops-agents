@@ -57,11 +57,6 @@ resource "null_resource" "build_and_push_image" {
   provisioner "local-exec" {
     interpreter = [ "/bin/bash", "-c" ]
     command = <<EOT
-      export AZURE_CORE_OUTPUT="none"
-      export LANG=en_US.UTF-8
-      export LC_ALL=en_US.UTF-8
-      export PYTHONIOENCODING=UTF-8
-      export PYTHONUTF8=1
       az acr build \
         --registry ${data.azurerm_container_registry.acr.name} \
         --image ${format("%s:%s", each.value.image, each.value.content_hash)} \
