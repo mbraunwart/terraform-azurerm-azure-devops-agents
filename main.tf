@@ -55,7 +55,11 @@ resource "null_resource" "build_and_push_image" {
     content_hash = each.value.content_hash
   }
   provisioner "local-exec" {
+    interpreter = [ "/bin/bash", "-c" ]
     command = <<-EOT
+      export LANG=en_US.UTF-8
+      export LC_ALL=en_US.UTF-8
+      export PYTHONIOENCODING=UTF-8
       path="$(dirname '${each.value.dockerfile_path}')"
       az acr build \
         --registry ${data.azurerm_container_registry.acr.name} \
