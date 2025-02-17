@@ -62,8 +62,7 @@ resource "null_resource" "build_and_push_image" {
         --image ${format("%s:%s", each.value.image, each.value.content_hash)} \
         --file '${each.value.dockerfile_path}' \
         --build-arg AGENT_VERSION=${var.agent_version} \
-        --build-arg TARGETARCH=${var.target_arch} \        
-        --no-format \
+        --build-arg TARGETARCH=${var.target_arch} \
         $path
       EOT
   }
