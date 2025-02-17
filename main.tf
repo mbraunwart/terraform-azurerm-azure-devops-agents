@@ -56,18 +56,18 @@ resource "null_resource" "build_and_push_image" {
   }
   provisioner "local-exec" {
     interpreter = [ "/bin/bash", "-c" ]
-    command = <<-EOT
+    command = <<EOT
       export LANG=en_US.UTF-8
       export LC_ALL=en_US.UTF-8
       export PYTHONIOENCODING=UTF-8
-      path="$(dirname '${each.value.dockerfile_path}')"
+      export PYTHONUTF8=1
       az acr build \
         --registry ${data.azurerm_container_registry.acr.name} \
         --image ${format("%s:%s", each.value.image, each.value.content_hash)} \
         --file '${each.value.dockerfile_path}' \
         --build-arg AGENT_VERSION=${var.agent_version} \
         --build-arg TARGETARCH=${var.target_arch} \
-        $path
+        "$(dirname '${each.value.dockerfile_path}')"
       EOT
   }
 
