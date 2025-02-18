@@ -10,7 +10,18 @@ ARG TARGETARCH
 ENV TARGETARCH=${TARGETARCH}
 
 RUN apt update
-RUN apt install -y curl git jq libicu70 apt-transport-https ca-certificates software-properties-common wget apt-utils
+RUN apt install -y \
+    curl \
+    git \
+    jq \
+    libicu70 \
+    apt-transport-https \
+    ca-certificates \
+    software-properties-common \
+    wget \
+    apt-utils \
+    unzip \
+    zip
 RUN apt upgrade -y
 
 RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash
