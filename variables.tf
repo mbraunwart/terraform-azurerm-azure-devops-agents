@@ -106,7 +106,6 @@ variable "container_registry" {
     login_server    = string
     admin_username  = string
     admin_password  = string
-    principal_id    = string
   })
   description = <<EOF
 Container registry configuration object including:
@@ -115,6 +114,5 @@ Container registry configuration object including:
   `login_server`    - The login server URL for the container registry.
   `admin_username`  - The username used for admin access.
   `admin_password`  - The password used for admin access.
-  `principal_id`    - The principal ID used for role assignments.
 EOF
 }
