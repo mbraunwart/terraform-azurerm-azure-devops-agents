@@ -35,7 +35,7 @@ resource "azurerm_role_assignment" "acr_pull" {
   count                = var.create_registry ? 1 : 0
   scope                = var.container_registry.id
   role_definition_name = "AcrPull"
-  principal_id         = var.container_registry.principal_id
+  principal_id         = data.azurerm_client_config.current.object_id
 }
 
 resource "time_sleep" "timer" {
