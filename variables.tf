@@ -14,11 +14,6 @@ variable "create_registry" {
   default     = true
 }
 
-variable "container_registry_name" {
-  type        = string
-  description = "The name of the container registry."
-}
-
 variable "agent_version" {
   description = "Version of the Azure DevOps agent to install"
   type        = string
@@ -102,4 +97,24 @@ variable "log_analytics_workspace_key" {
   type        = string
   description = "The shared key of the Log Analytics workspace"
   sensitive   = true
+}
+
+variable "container_registry" {
+  type = object({
+    id              = string
+    name            = string
+    login_server    = string
+    admin_username  = string
+    admin_password  = string
+    principal_id    = string
+  })
+  description = <<EOF
+Container registry configuration object including:
+  `id`              - The resource ID of the container registry.
+  `name`            - The name of the container registry.
+  `login_server`    - The login server URL for the container registry.
+  `admin_username`  - The username used for admin access.
+  `admin_password`  - The password used for admin access.
+  `principal_id`    - The principal ID used for role assignments.
+EOF
 }

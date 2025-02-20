@@ -1,10 +1,5 @@
 data "azurerm_client_config" "current" {}
 
-data "azurerm_container_registry" "acr" {
-  name                = var.container_registry_name
-  resource_group_name = var.resource_group_name
-}
-
 locals {
   available_dockerfiles = {
     terraform = "${path.module}/Dockerfile.linux_terraform"
@@ -38,9 +33,9 @@ locals {
 
 resource "azurerm_role_assignment" "acr_pull" {
   count                = var.create_registry ? 1 : 0
-  scope                = data.azurerm_container_registry.acr.id
+  scope                = var.container_registry.id
   role_definition_name = "AcrPull"
-  principal_id         = data.azurerm_client_config.current.object_id
+  principal_id         = var.container_registry.principal_id
 }
 
 resource "time_sleep" "timer" {
@@ -58,7 +53,7 @@ resource "null_resource" "build_and_push_image" {
     interpreter = [ "/bin/bash", "-c" ]
     command = <<EOT
       az acr build \
-        --registry ${data.azurerm_container_registry.acr.name} \
+        --registry ${var.container_registry.name} \
         --image ${format("%s:%s", each.value.image, each.value.content_hash)} \
         --file '${each.value.dockerfile_path}' \
         --build-arg AGENT_VERSION=${var.agent_version} \
@@ -87,16 +82,16 @@ resource "azurerm_container_group" "cg" {
   }
 
   image_registry_credential {
-    server   = data.azurerm_container_registry.acr.login_server
-    username = data.azurerm_container_registry.acr.admin_username
-    password = data.azurerm_container_registry.acr.admin_password
+    server   = var.container_registry.login_server
+    username = var.container_registry.admin_username
+    password = var.container_registry.admin_password
   }
 
   dynamic "container" {
     for_each = var.containers
     content {
       name = container.value.name
-      image = format("%s/%s:%s", data.azurerm_container_registry.acr.login_server, container.value.image,
+      image = format("%s/%s:%s", var.container_registry.login_server, container.value.image,
       [for c in local.containers : c.content_hash if c.image == container.value.image][0])
       cpu    = container.value.cpu
       memory = container.value.memory
@@ -129,11 +124,11 @@ resource "azurerm_container_group" "cg" {
     replace_triggered_by = [null_resource.build_and_push_image]
   }
 
-  depends_on = [null_resource.build_and_push_image, data.azurerm_container_registry.acr]
+  depends_on = [null_resource.build_and_push_image]
 }
 
 resource "azurerm_role_assignment" "acr_pull_ca" {
-  scope                = data.azurerm_container_registry.acr.id
+  scope                = var.container_registry.id
   role_definition_name = "AcrPull"
   principal_id         = azurerm_container_group.cg.identity[0].principal_id
 }
