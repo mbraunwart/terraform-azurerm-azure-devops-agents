@@ -144,11 +144,11 @@ Type:
 
 ```hcl
 object({
-    id              = string
-    name            = string
-    login_server    = string
-    admin_username  = string
-    admin_password  = string
+    id             = string
+    name           = string
+    login_server   = string
+    admin_username = string
+    admin_password = string
   })
 ```
 
@@ -262,6 +262,14 @@ Description: OS type for the container group
 Type: `string`
 
 Default: `"Linux"`
+
+### <a name="input_tags"></a> [tags](#input_tags)
+
+Description: A mapping of tags to assign to the resource.
+
+Type: `map(string)`
+
+Default: `{}`
 
 ### <a name="input_target_arch"></a> [target_arch](#input_target_arch)
 

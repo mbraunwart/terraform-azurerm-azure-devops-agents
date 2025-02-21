@@ -36,6 +36,7 @@ resource "azurerm_role_assignment" "acr_pull" {
   scope                = var.container_registry.id
   role_definition_name = "AcrPull"
   principal_id         = data.azurerm_client_config.current.object_id
+
 }
 
 resource "time_sleep" "timer" {
@@ -123,6 +124,8 @@ resource "azurerm_container_group" "cg" {
   lifecycle {
     replace_triggered_by = [null_resource.build_and_push_image]
   }
+
+  tags = var.tags
 
   depends_on = [null_resource.build_and_push_image]
 }

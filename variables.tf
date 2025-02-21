@@ -101,11 +101,11 @@ variable "log_analytics_workspace_key" {
 
 variable "container_registry" {
   type = object({
-    id              = string
-    name            = string
-    login_server    = string
-    admin_username  = string
-    admin_password  = string
+    id             = string
+    name           = string
+    login_server   = string
+    admin_username = string
+    admin_password = string
   })
   description = <<EOF
 Container registry configuration object including:
@@ -115,4 +115,10 @@ Container registry configuration object including:
   `admin_username`  - The username used for admin access.
   `admin_password`  - The password used for admin access.
 EOF
+}
+
+variable "tags" {
+  type        = map(string)
+  description = "A mapping of tags to assign to the resource."
+  default     = {}
 }
